@@ -22,7 +22,7 @@ module JekyllMath
       end
     end
 
-    class TheoremTagBlock < Liquid::Block
+    class TheoremBlock < Liquid::Block
       @@html_class = "theorem"
       @@attr_prefix = "theorem"
 
@@ -56,7 +56,7 @@ module JekyllMath
       end
     end
 
-    class ProofTagBlock < Liquid::Block
+    class ProofBlock < Liquid::Block
       @@html_class = "proof"
       def initialize(tag_name, text, tokens)
         super
@@ -84,7 +84,7 @@ end
 Jekyll::Hooks.register :site, :post_read do |site|
   theorem_types = JekyllMath::Crossref::TheoremTypes.new(site)
   theorem_types.keys.each do |theorem_key|
-    Liquid::Template.register_tag(theorem_key, JekyllMath::Crossref::TheoremTagBlock)
+    Liquid::Template.register_tag(theorem_key, JekyllMath::Crossref::TheoremBlock)
   end
 end
-Liquid::Template.register_tag('proof', JekyllMath::Crossref::ProofTagBlock)
+Liquid::Template.register_tag('proof', JekyllMath::Crossref::ProofBlock)
