@@ -1,0 +1,68 @@
+---
+---
+
+body {
+  left: 0;
+  right: 0;
+  margin: auto;
+  max-width: 1000px;
+  background-color: #dee;
+}
+
+h1 {
+  color: #11d;
+}
+
+h2 {
+  color: #161;
+}
+
+header {
+  border-bottom: 10px solid #a33;
+}
+
+footer {
+  background-color: #a33;
+  color: #fff;
+}
+
+.warning {
+  background-color: #f00;
+  color: #fff;
+}
+
+$theorem: "theorem";
+.#{$theorem} {
+  border: 1px solid gray;
+  margin: 2px;
+
+  .#{$theorem}-header {
+    // border-bottom: 1px solid gray;
+    text-decoration: underline gray;
+    font-weight: bold;
+    padding-top: 2px;
+    padding-left: 2px;
+  }
+
+  .#{$theorem}-content {
+    padding: 2px;
+  }
+}
+
+div[#{$theorem}-key="theorem"] {
+  color: brown;
+}
+
+$proof: "proof";
+.#{$proof} {
+  margin-left: 5px;
+  .#{$proof}-header {
+    text-decoration: underline gray;
+    font-weight: bold;
+  }
+  .#{$proof}-content {
+    margin-left: 5px;
+    padding-left: 10px;
+    border-left: 3px solid gray;
+  }
+}

@@ -1,0 +1,11 @@
+livereload: true
+plugins:
+  - jekyll-math
+crossref:
+  theorem: 定理
+  definition: 定義
+  proposition: 命題
+  lemma: 補題
+  corollary: 系
+  remark: 注意
+  example: 例
