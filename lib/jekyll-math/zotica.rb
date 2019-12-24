@@ -3,7 +3,7 @@
 require 'pathname'
 require 'zotica'
 
-module Crossref
+module JekyllMath
   module Zotica
     def self.convert(source)
       parser = ZoticaParser.new(source)
@@ -32,4 +32,4 @@ module Crossref
   end
 end
 
-Liquid::Template.register_tag('zotica', Crossref::Zotica::ZoticaTag)
+Liquid::Template.register_tag('zotica', JekyllMath::Zotica::ZoticaTag)
