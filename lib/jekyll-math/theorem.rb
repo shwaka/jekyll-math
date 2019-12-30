@@ -32,8 +32,9 @@ module JekyllMath
         @theorem_key = tag_name
         parser = ::JekyllMath::ArgParser.new(text)
         args = parser.args(0)
-        kwargs = parser.kwargs(nil, ["label"])
+        kwargs = parser.kwargs(nil, ["label", "caption"])
         @label = kwargs["label"] || self.create_label(@theorem_key, text)
+        @caption = kwargs["caption"]
         super
       end
 
@@ -53,8 +54,20 @@ module JekyllMath
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.div("class" => @@html_class,
                   "#{@@attr_prefix}-key" => @theorem_key){
-            xml.div(handler.cref(@label),
-                    "class" => "#{@@html_class}-header")
+            xml.div("class" => "#{@@html_class}-header"){
+              xml.span(handler.cref(@label),
+                      "class" => "#{@@html_class}-name")
+              if not @caption.nil?
+                xml.span("class" => "#{@@html_class}-caption"){
+                  xml.span("(",
+                           "class" => "#{@@html_class}-caption-paren")
+                  xml.span(@caption,
+                           "class" => "#{@@html_class}-caption-content")
+                  xml.span(")",
+                           "class" => "#{@@html_class}-caption-paren")
+                }
+              end
+            }
             xml.div("class" => "#{@@html_class}-content")
           }
         end

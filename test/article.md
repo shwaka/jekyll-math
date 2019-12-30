@@ -9,7 +9,7 @@ In this article, we prove an awesome theorem.
 # Background
 hoge
 
-{% theorem label=foo %}
+{% theorem label=foo caption=hoge%}
   content of theorem
 {% endtheorem %}
 
@@ -21,7 +21,7 @@ hoge
   content of theorem
 {% endtheorem %}
 
-{% definition label=hoge %}
+{% definition label=hoge caption="foo bar" %}
   何かの定義
 {% enddefinition %}
 

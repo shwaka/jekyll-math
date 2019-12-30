@@ -1,12 +1,13 @@
 ---
 ---
 
+$background-base: #dee;
 body {
   left: 0;
   right: 0;
   margin: auto;
   max-width: 1000px;
-  background-color: #dee;
+  background-color: $background-base;
 }
 
 h1 {
@@ -37,11 +38,24 @@ $theorem: "theorem";
   margin: 2px;
 
   .#{$theorem}-header {
-    // border-bottom: 1px solid gray;
-    text-decoration: underline gray;
-    font-weight: bold;
-    padding-top: 2px;
-    padding-left: 2px;
+    padding: 3px;
+    background-color: darken($background-base, 20%);
+    .#{$theorem}-name {
+      // border-bottom, display, line-height の3つで下線を引いている
+      border-bottom: 2px solid gray;
+      display: inline-block;
+      line-height: 0.85;
+      // text-decoration: underline gray;
+      font-weight: bold;
+      padding-top: 2px;
+      padding-left: 2px;
+    }
+    .#{$theorem}-caption-content {
+      color: green;
+    }
+    .#{theorem}-caption-paren {
+      color: gray;
+    }
   }
 
   .#{$theorem}-content {
