@@ -29,48 +29,60 @@ module JekyllMath
       @@theorem_attr_prefix = "theorem" # TheoremBlock の @@attr_prefix
       def initialize(page)
         super
-        @data[:captions] ||= {}
-        @captions = @data[:captions]
-        @data[:label_for_caption] ||= nil
+        @data[:caption_temp] ||= nil
       end
 
-      def add_caption(label, content)
-        @data[:captions] ||= {}
-        if @captions.has_key?(label)
-          raise "Caption for the key '#{label}' is already defined"
-        end
-        @captions[label] = content
-      end
+      # def add_caption(label, content)
+      #   @data[:captions] ||= {}
+      #   if @captions.has_key?(label)
+      #     raise "Caption for the key '#{label}' is already defined"
+      #   end
+      #   @captions[label] = content
+      # end
 
       # def get_caption(label)
       #   return @captions[label]
       # end
 
-      def replace_captions
-        html = @page.output
-        doc = Nokogiri::HTML.parse(html)
-        doc.css(".#{@@theorem_class}").each do |elm|
-          label = elm.attr("#{@@theorem_attr_prefix}-label")
-          if @captions.has_key?(label)
-            elm.css(".#{@@theorem_class}-caption-content").each do |elm_content|
-              # 一つしかヒットしないはず
-              elm_content.inner_html = @captions[label]
-            end
-          end
-          # p @captions[label]
-          # label = elm.attr("#{@@ref_attr_prefix}-label")
-          # command = elm.attr("#{@@ref_attr_prefix}-command")
-          # elm.content = self.ref_or_cref(command, label)
-        end
-        @page.output = doc.inner_html
+      # def replace_captions
+      #   html = @page.output
+      #   doc = Nokogiri::HTML.parse(html)
+      #   doc.css(".#{@@theorem_class}").each do |elm|
+      #     label = elm.attr("#{@@theorem_attr_prefix}-label")
+      #     if @captions.has_key?(label)
+      #       elm.css(".#{@@theorem_class}-caption-content").each do |elm_content|
+      #         # 一つしかヒットしないはず
+      #         elm_content.inner_html = @captions[label]
+      #       end
+      #     end
+      #     # p @captions[label]
+      #     # label = elm.attr("#{@@ref_attr_prefix}-label")
+      #     # command = elm.attr("#{@@ref_attr_prefix}-command")
+      #     # elm.content = self.ref_or_cref(command, label)
+      #   end
+      #   @page.output = doc.inner_html
+      # end
+
+      # def save_label(label)
+      #   @data[:label_for_caption] = label
+      # end
+
+      # def load_label
+      #   return @data[:label_for_caption]
+      # end
+
+      def save_caption(caption)
+        @data[:caption_temp] = caption
       end
 
-      def save_label(label)
-        @data[:label_for_caption] = label
+      def clear_caption
+        self.save_caption(nil)
       end
 
-      def load_label
-        return @data[:label_for_caption]
+      def load_caption
+        caption = @data[:caption_temp]
+        self.clear_caption
+        return caption
       end
     end
 
@@ -82,8 +94,9 @@ module JekyllMath
       def render(context)
         content = super
         handler = CaptionHandler.from_context(context)
-        label = handler.load_label
-        handler.add_caption(label, content)
+        # label = handler.load_label
+        # handler.add_caption(label, content)
+        handler.save_caption(content)
         return ""
       end
     end
@@ -108,15 +121,34 @@ module JekyllMath
         return "#{key}-#{md5}"
       end
 
-      def save_label(context)
-        # 後で caption block で使うために記録
+      # def save_label(context)
+      #   # 後で caption block で使うために記録
+      #   caption_handler = CaptionHandler.from_context(context)
+      #   caption_handler.save_label(@label)
+      # end
+
+      def clear_caption(context)
         caption_handler = CaptionHandler.from_context(context)
-        caption_handler.save_label(@label)
+        caption_handler.clear_caption
+      end
+
+      def load_caption(context)
+        caption_handler = CaptionHandler.from_context(context)
+        caption = caption_handler.load_caption
+        # ↑caption がなければ，nil が返ってくる
+        if @caption.nil?
+          @caption = caption
+        elsif not caption.nil?
+          # caption=hoge と {% caption %} の両方で指定された場合
+          raise "Duplicated caption specification: #{@caption}, #{caption}"
+        end
       end
 
       def render(context)
+        self.clear_caption(context)  # theorem の外で指定した caption を持ち込まないように
         content = super
-        self.save_label(context)
+        # self.save_label(context)
+        self.load_caption(context)
         ref_handler = RefHandler.from_context(context)
         site = context.registers[:site]
         theorem_types = TheoremTypes.new(site)
@@ -133,8 +165,7 @@ module JekyllMath
                 xml.span("class" => "#{@@html_class}-caption"){
                   xml.span("(",
                            "class" => "#{@@html_class}-caption-paren")
-                  xml.span(@caption,
-                           "class" => "#{@@html_class}-caption-content")
+                  xml.span("class" => "#{@@html_class}-caption-content")
                   xml.span(")",
                            "class" => "#{@@html_class}-caption-paren")
                 }
@@ -147,6 +178,10 @@ module JekyllMath
         xml_root.css(".#{@@html_class}-content").each do |node|
           # xml.div(content) としてしまうと，内部のhtmlがエスケープされてしまう
           node.inner_html = content
+        end
+        xml_root.css(".#{@@html_class}-caption-content").each do |node|
+          # 上と同様に html のエスケープを回避するため
+          node.inner_html = @caption
         end
         return xml_root.to_s
       end
@@ -185,10 +220,10 @@ Jekyll::Hooks.register :site, :post_read do |site|
 end
 Liquid::Template.register_tag('proof', JekyllMath::Crossref::ProofBlock)
 Liquid::Template.register_tag('caption', JekyllMath::Crossref::CaptionBlock)
-Jekyll::Hooks.register :pages, :post_render, priority: 30 do |page|
-  # ref の置換より先にこっちをやりたいので，priority を大きく設定
-  if [".md", ".html"].include?(page.ext)
-    handler = JekyllMath::Crossref::CaptionHandler.from_page(page)
-    handler.replace_captions
-  end
-end
+# Jekyll::Hooks.register :pages, :post_render, priority: 30 do |page|
+#   # ref の置換より先にこっちをやりたいので，priority を大きく設定
+#   if [".md", ".html"].include?(page.ext)
+#     handler = JekyllMath::Crossref::CaptionHandler.from_page(page)
+#     handler.replace_captions
+#   end
+# end
