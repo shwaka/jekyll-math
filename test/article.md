@@ -41,11 +41,11 @@ This is some text!!!
 
 {% cref foo %}
 
-{% remark rem %}
+{% remark %}
   {{ page.layout }}
 {% endremark %}
 
-{% example ex %}
+{% example %}
   This is an example of {% cref baz %}.
 {% endexample %}
 # Proof of main theorem

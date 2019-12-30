@@ -11,9 +11,18 @@ module JekyllMath
       @kwargs = nil
     end
 
-    def args
+    def args(num_req=nil, num_opt=0)
+      # num_req 個の必須引数，num_opt 個のオプション引数
       if @args.nil?
         self.set_args
+      end
+      if not num_req.nil?
+        len = @args.length
+        if len < num_req
+          raise "Error: too few arguments #{@args}, #{len} given, #{num_req} required"
+        elsif len > num_req + num_opt
+          raise "Error: too many arguments #{@args}, #{len} given, #{num_req+num_opt} allowed\n"
+        end
       end
       return @args
     end
