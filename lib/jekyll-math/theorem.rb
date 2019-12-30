@@ -32,8 +32,7 @@ module JekyllMath
         @theorem_key = tag_name
         parser = ::JekyllMath::ArgParser.new(text)
         args = parser.args(0)
-        kwargs = parser.kwargs
-        # @label = text.strip
+        kwargs = parser.kwargs(nil, ["label"])
         @label = kwargs["label"] || self.create_label(@theorem_key, text)
         super
       end

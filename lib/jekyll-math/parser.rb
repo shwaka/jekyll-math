@@ -27,9 +27,28 @@ module JekyllMath
       return @args
     end
 
-    def kwargs
+    def kwargs(keys_req=nil, keys_opt=nil)
+      # keys_req, keys_opt: nil or list of strings
+      # keys_req は必須 key，keys_opt はオプション key
+      # 両方が nil なら，何もチェックしない
       if @kwargs.nil?
         self.set_args
+      end
+      keys = @kwargs.keys
+      if not keys_req.nil?
+        # 必須 key がちゃんとあるかチェック
+        missing_keys = keys_req.select{|key| not keys.include?(key)}
+        if missing_keys.length > 0
+          raise "missing keys: #{missing_keys}"
+        end
+      end
+      if not keys_opt.nil?
+        # 余計な key がないかチェック
+        allowed_keys = (keys_req || []) + keys_opt
+        illegal_keys = keys.select{|key| not allowed_keys.include?(key)}
+        if illegal_keys.length > 0
+          raise "illegal keys: #{illegal_keys}"
+        end
       end
       return @kwargs
     end
