@@ -9,7 +9,7 @@ In this article, we prove an awesome theorem.
 # Background
 hoge
 
-{% theorem foo %}
+{% theorem label=foo %}
   content of theorem
 {% endtheorem %}
 
@@ -17,21 +17,21 @@ hoge
 {% cref hoge %}
 {% cref bar%}
 
-{% theorem bar %}
+{% theorem label=bar %}
   content of theorem
 {% endtheorem %}
 
-{% definition hoge %}
+{% definition label=hoge %}
   何かの定義
 {% enddefinition %}
 
-{% proposition aaa %}
+{% proposition %}
   これは命題
 {% endproposition %}
 {% proof %}
   {% cref hoge %} から明らかに成り立つ．
 {% endproof %}
-{% theorem baz %}
+{% theorem label=baz %}
   This is an awesome theorem!!!
   <pre>hoge</pre>
 {% endtheorem %}

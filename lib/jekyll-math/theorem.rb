@@ -1,5 +1,7 @@
 # coding: utf-8
+require "digest"
 require "jekyll-math/crossref"
+require "jekyll-math/parser"
 
 module JekyllMath
   module Crossref
@@ -27,9 +29,19 @@ module JekyllMath
       @@attr_prefix = "theorem"
 
       def initialize(tag_name, text, tokens)
-        @label = text.strip
         @theorem_key = tag_name
+        parser = ::JekyllMath::ArgParser.new(text)
+        args = parser.args
+        kwargs = parser.kwargs
+        # @label = text.strip
+        @label = kwargs["label"] || self.create_label(@theorem_key, text)
         super
+      end
+
+      def create_label(key, text)
+        plain = "#{key}-#{text}-#{Time.now}"
+        md5 = Digest::MD5.hexdigest(plain)
+        return "#{key}-#{md5}"
       end
 
       def render(context)
