@@ -1,35 +1,17 @@
 # coding: utf-8
 require 'nokogiri'
+require 'jekyll-math/data-handler'
 
 module JekyllMath
   module Crossref
-    class DataHandler
-      @@data_key = :crossref
+    class RefHandler < ::JekyllMath::DataHandler
       @@ref_class = "crossref"
       @@ref_attr_prefix = "crossref"
 
-      def self.from_context(context)
-        context = context
-        site = context.registers[:site]
-        current_page = site.pages.find{|page|
-          current_page_path = context.registers[:page]["path"]
-          page["path"] == current_page_path }
-        return self.new(current_page)
-      end
-
-      def self.from_page(page)
-        return self.new(page)
-      end
-
       def initialize(page)
-        # ↓page 内に複数の label を書いたときは，
-        # 最初は @@data_key は未定義，それ以降は定義済みになる
-        @page = page
-        @page.data[@@data_key] ||= {
-          :count => 0,
-          :labels => {}
-        }
-        @data = @page.data[@@data_key]
+        super
+        @data[:count] ||= 0
+        @data[:labels] ||= {}
         @labels = @data[:labels]
       end
 
@@ -106,7 +88,7 @@ module JekyllMath
       end
 
       def render(context)
-        handler = DataHandler.from_context(context)
+        handler = RefHandler.from_context(context)
         handler.add_label(@label, "定理")
         # return "label: #{@label}, cref: #{handler.cref(@label)}"
         return ""
@@ -121,7 +103,7 @@ module JekyllMath
       end
 
       def render(context)
-        handler = DataHandler.from_context(context)
+        handler = RefHandler.from_context(context)
         return handler.ref_elm_str(@command, @label)
       end
     end
@@ -146,7 +128,7 @@ Liquid::Template.register_tag('cref', JekyllMath::Crossref::CrefTag)
 
 Jekyll::Hooks.register :pages, :post_render do |page|
   if [".md", ".html"].include?(page.ext)
-    handler = JekyllMath::Crossref::DataHandler.from_page(page)
+    handler = JekyllMath::Crossref::RefHandler.from_page(page)
     handler.replace_refs
   end
 end

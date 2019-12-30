@@ -46,7 +46,7 @@ module JekyllMath
 
       def render(context)
         content = super
-        handler = DataHandler.from_context(context)
+        handler = RefHandler.from_context(context)
         site = context.registers[:site]
         theorem_types = TheoremTypes.new(site)
         theorem_name = theorem_types.get_name(@theorem_key)
