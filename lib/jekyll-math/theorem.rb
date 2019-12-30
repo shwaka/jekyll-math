@@ -24,6 +24,70 @@ module JekyllMath
       end
     end
 
+    class CaptionHandler < ::JekyllMath::DataHandler
+      @@theorem_class = "theorem" # TheoremBlock の @@html_class
+      @@theorem_attr_prefix = "theorem" # TheoremBlock の @@attr_prefix
+      def initialize(page)
+        super
+        @data[:captions] ||= {}
+        @captions = @data[:captions]
+        @data[:label_for_caption] ||= nil
+      end
+
+      def add_caption(label, content)
+        @data[:captions] ||= {}
+        if @captions.has_key?(label)
+          raise "Caption for the key '#{label}' is already defined"
+        end
+        @captions[label] = content
+      end
+
+      # def get_caption(label)
+      #   return @captions[label]
+      # end
+
+      def replace_captions
+        html = @page.output
+        doc = Nokogiri::HTML.parse(html)
+        doc.css(".#{@@theorem_class}").each do |elm|
+          label = elm.attr("#{@@theorem_attr_prefix}-label")
+          if @captions.has_key?(label)
+            elm.css(".#{@@theorem_class}-caption-content").each do |elm_content|
+              # 一つしかヒットしないはず
+              elm_content.inner_html = @captions[label]
+            end
+          end
+          # p @captions[label]
+          # label = elm.attr("#{@@ref_attr_prefix}-label")
+          # command = elm.attr("#{@@ref_attr_prefix}-command")
+          # elm.content = self.ref_or_cref(command, label)
+        end
+        @page.output = doc.inner_html
+      end
+
+      def save_label(label)
+        @data[:label_for_caption] = label
+      end
+
+      def load_label
+        return @data[:label_for_caption]
+      end
+    end
+
+    class CaptionBlock < Liquid::Block
+      def initialize(tag_name, text, tokens)
+        super
+      end
+
+      def render(context)
+        content = super
+        handler = CaptionHandler.from_context(context)
+        label = handler.load_label
+        handler.add_caption(label, content)
+        return ""
+      end
+    end
+
     class TheoremBlock < Liquid::Block
       @@html_class = "theorem"
       @@attr_prefix = "theorem"
@@ -44,18 +108,26 @@ module JekyllMath
         return "#{key}-#{md5}"
       end
 
+      def save_label(context)
+        # 後で caption block で使うために記録
+        caption_handler = CaptionHandler.from_context(context)
+        caption_handler.save_label(@label)
+      end
+
       def render(context)
         content = super
-        handler = RefHandler.from_context(context)
+        self.save_label(context)
+        ref_handler = RefHandler.from_context(context)
         site = context.registers[:site]
         theorem_types = TheoremTypes.new(site)
         theorem_name = theorem_types.get_name(@theorem_key)
-        handler.add_label(@label, theorem_name)
+        ref_handler.add_label(@label, theorem_name)
         builder = Nokogiri::XML::Builder.new do |xml|
           xml.div("class" => @@html_class,
-                  "#{@@attr_prefix}-key" => @theorem_key){
+                  "#{@@attr_prefix}-key" => @theorem_key,
+                  "#{@@attr_prefix}-label" => @label){
             xml.div("class" => "#{@@html_class}-header"){
-              xml.span(handler.cref(@label),
+              xml.span(ref_handler.cref(@label),
                       "class" => "#{@@html_class}-name")
               if not @caption.nil?
                 xml.span("class" => "#{@@html_class}-caption"){
@@ -112,3 +184,11 @@ Jekyll::Hooks.register :site, :post_read do |site|
   end
 end
 Liquid::Template.register_tag('proof', JekyllMath::Crossref::ProofBlock)
+Liquid::Template.register_tag('caption', JekyllMath::Crossref::CaptionBlock)
+Jekyll::Hooks.register :pages, :post_render, priority: 30 do |page|
+  # ref の置換より先にこっちをやりたいので，priority を大きく設定
+  if [".md", ".html"].include?(page.ext)
+    handler = JekyllMath::Crossref::CaptionHandler.from_page(page)
+    handler.replace_captions
+  end
+end

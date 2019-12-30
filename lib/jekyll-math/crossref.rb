@@ -126,7 +126,8 @@ Liquid::Template.register_tag('label', JekyllMath::Crossref::LabelTag)
 Liquid::Template.register_tag('ref', JekyllMath::Crossref::RefTag)
 Liquid::Template.register_tag('cref', JekyllMath::Crossref::CrefTag)
 
-Jekyll::Hooks.register :pages, :post_render do |page|
+Jekyll::Hooks.register :pages, :post_render, priority: 20 do |page|
+  # theorem の caption との兼ね合いで priority が大事 (20はデフォルト値)
   if [".md", ".html"].include?(page.ext)
     handler = JekyllMath::Crossref::RefHandler.from_page(page)
     handler.replace_refs

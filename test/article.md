@@ -25,13 +25,17 @@ hoge
   何かの定義
 {% enddefinition %}
 
-{% proposition %}
+{% proposition caption=.%}
   これは命題
 {% endproposition %}
 {% proof %}
   {% cref hoge %} から明らかに成り立つ．
 {% endproof %}
-{% theorem label=baz %}
+{% theorem label=baz caption=.%}
+  {% caption %}
+    This is a caption for
+    {% cref baz %}.
+  {% endcaption %}
   This is an awesome theorem!!!
   <pre>hoge</pre>
 {% endtheorem %}
