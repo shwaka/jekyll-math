@@ -32,45 +32,6 @@ module JekyllMath
         @data[:caption_temp] ||= nil
       end
 
-      # def add_caption(label, content)
-      #   @data[:captions] ||= {}
-      #   if @captions.has_key?(label)
-      #     raise "Caption for the key '#{label}' is already defined"
-      #   end
-      #   @captions[label] = content
-      # end
-
-      # def get_caption(label)
-      #   return @captions[label]
-      # end
-
-      # def replace_captions
-      #   html = @page.output
-      #   doc = Nokogiri::HTML.parse(html)
-      #   doc.css(".#{@@theorem_class}").each do |elm|
-      #     label = elm.attr("#{@@theorem_attr_prefix}-label")
-      #     if @captions.has_key?(label)
-      #       elm.css(".#{@@theorem_class}-caption-content").each do |elm_content|
-      #         # 一つしかヒットしないはず
-      #         elm_content.inner_html = @captions[label]
-      #       end
-      #     end
-      #     # p @captions[label]
-      #     # label = elm.attr("#{@@ref_attr_prefix}-label")
-      #     # command = elm.attr("#{@@ref_attr_prefix}-command")
-      #     # elm.content = self.ref_or_cref(command, label)
-      #   end
-      #   @page.output = doc.inner_html
-      # end
-
-      # def save_label(label)
-      #   @data[:label_for_caption] = label
-      # end
-
-      # def load_label
-      #   return @data[:label_for_caption]
-      # end
-
       def save_caption(caption)
         @data[:caption_temp] = caption
       end
@@ -94,8 +55,6 @@ module JekyllMath
       def render(context)
         content = super
         handler = CaptionHandler.from_context(context)
-        # label = handler.load_label
-        # handler.add_caption(label, content)
         handler.save_caption(content)
         return ""
       end
@@ -121,12 +80,6 @@ module JekyllMath
         return "#{key}-#{md5}"
       end
 
-      # def save_label(context)
-      #   # 後で caption block で使うために記録
-      #   caption_handler = CaptionHandler.from_context(context)
-      #   caption_handler.save_label(@label)
-      # end
-
       def clear_caption(context)
         caption_handler = CaptionHandler.from_context(context)
         caption_handler.clear_caption
@@ -147,7 +100,6 @@ module JekyllMath
       def render(context)
         self.clear_caption(context)  # theorem の外で指定した caption を持ち込まないように
         content = super
-        # self.save_label(context)
         self.load_caption(context)
         ref_handler = RefHandler.from_context(context)
         site = context.registers[:site]
@@ -220,10 +172,3 @@ Jekyll::Hooks.register :site, :post_read do |site|
 end
 Liquid::Template.register_tag('proof', JekyllMath::Crossref::ProofBlock)
 Liquid::Template.register_tag('caption', JekyllMath::Crossref::CaptionBlock)
-# Jekyll::Hooks.register :pages, :post_render, priority: 30 do |page|
-#   # ref の置換より先にこっちをやりたいので，priority を大きく設定
-#   if [".md", ".html"].include?(page.ext)
-#     handler = JekyllMath::Crossref::CaptionHandler.from_page(page)
-#     handler.replace_captions
-#   end
-# end
