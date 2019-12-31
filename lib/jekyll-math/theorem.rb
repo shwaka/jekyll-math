@@ -63,6 +63,7 @@ module JekyllMath
     class TheoremBlock < Liquid::Block
       @@html_class = "theorem"
       @@attr_prefix = "theorem"
+      @@count_create_label = 0  # create_label での md5 ハッシュ値の衝突を回避するため
 
       def initialize(tag_name, text, tokens)
         @theorem_key = tag_name
@@ -75,7 +76,8 @@ module JekyllMath
       end
 
       def create_label(key, text)
-        plain = "#{key}-#{text}-#{Time.now}"
+        @@count_create_label += 1
+        plain = "#{key}-#{text}-#{Time.now.to_f}-#{@@count_create_label}"
         md5 = Digest::MD5.hexdigest(plain)
         return "#{key}-#{md5}"
       end
