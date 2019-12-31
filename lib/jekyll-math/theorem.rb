@@ -106,39 +106,29 @@ module JekyllMath
         theorem_types = TheoremTypes.new(site)
         theorem_name = theorem_types.get_name(@theorem_key)
         ref_handler.add_label(@label, theorem_name)
-        builder = Nokogiri::XML::Builder.new do |xml|
-          xml.div("class" => @@html_class,
-                  "#{@@attr_prefix}-key" => @theorem_key,
-                  "#{@@attr_prefix}-label" => @label){
-            xml.div("class" => "#{@@html_class}-header"){
-              xml.span(ref_handler.cref(@label),
-                      "class" => "#{@@html_class}-name")
-              if not @caption.nil?
-                xml.span("class" => "#{@@html_class}-caption"){
-                  xml.span("(",
-                           "class" => "#{@@html_class}-caption-paren")
-                  xml.span("class" => "#{@@html_class}-caption-content")
-                  xml.span(")",
-                           "class" => "#{@@html_class}-caption-paren")
-                }
-              end
-            }
-            xml.div("class" => "#{@@html_class}-content",
-                    "markdown" => "block")
-            # markdown="block" については
-            # https://kramdown.gettalong.org/syntax.html#html-blocks を参照
-          }
+        if @caption.nil?
+          caption_html = ""
+        else
+          caption_html = <<EOS
+      <span class="#{@@html_class}-caption-paren">(</span>
+      <span class="#{@@html_class}-caption-content">#{@caption}</span>
+      <span class="#{@@html_class}-caption-paren">)</span>
+EOS
         end
-        xml_root = builder.doc.root
-        xml_root.css(".#{@@html_class}-content").each do |node|
-          # xml.div(content) としてしまうと，内部のhtmlがエスケープされてしまう
-          node.inner_html = content
-        end
-        xml_root.css(".#{@@html_class}-caption-content").each do |node|
-          # 上と同様に html のエスケープを回避するため
-          node.inner_html = @caption
-        end
-        return xml_root.to_s
+        html = <<EOS
+<div class="#{@@html_class}" #{@@attr_prefix}-key="#{@theorem_key}" #{@@attr_prefix}-label="#{@label}">
+  <div class="#{@@html_class}-header">
+    <span class="#{@@html_class}-name">#{ref_handler.cref(@label)}</span>
+    <span class="#{@@html_class}-caption">
+#{caption_html}
+    </span>
+  </div>
+  <div class="#{@@html_class}-content" markdown="block">
+    #{content}
+  </div>
+</div>
+EOS
+        return html
       end
     end
 
