@@ -35,6 +35,10 @@ layout: mylayout
 
   $$ a\sp<x><2> + bx + c = 0 $$
 
+  これも別行立て数式です．
+
+  $$ x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a> $$
+
 {% cref hoge %}
 {% cref bar%}
 

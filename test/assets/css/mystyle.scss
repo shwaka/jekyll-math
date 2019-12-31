@@ -84,3 +84,14 @@ $proof: "proof";
     border-left: 3px solid gray;
   }
 }
+
+.math-block {
+  margin: 10px 0px;
+  display: flex;
+  align-items: baseline;
+  line-height: 1;
+  math-root {
+    width: 100%;
+    text-align: center;
+  }
+}

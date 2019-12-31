@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:shwaka/kramdown-zotica.git
-  revision: 81650a52ce12a6d5de05036a548b0b2fa2f88375
+  revision: 0bc33e00a0326130b3d540f8ecf7139dcb444c00
   specs:
     kramdown-zotica (0.1.0)
       kramdown
@@ -62,7 +62,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
-    public_suffix (4.0.1)
+    public_suffix (4.0.2)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
