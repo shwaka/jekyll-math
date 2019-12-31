@@ -1,3 +1,11 @@
+GIT
+  remote: git@github.com:shwaka/kramdown-zotica.git
+  revision: 81650a52ce12a6d5de05036a548b0b2fa2f88375
+  specs:
+    kramdown-zotica (0.1.0)
+      kramdown
+      zotica
+
 PATH
   remote: ..
   specs:
@@ -78,6 +86,7 @@ PLATFORMS
 DEPENDENCIES
   jekyll
   jekyll-math!
+  kramdown-zotica!
 
 BUNDLED WITH
    1.17.2

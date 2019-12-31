@@ -2,3 +2,4 @@ source 'https://rubygems.org'
 
 gem 'jekyll'
 gem 'jekyll-math', :path => '..'
+gem 'kramdown-zotica', git: 'git@github.com:shwaka/kramdown-zotica.git'

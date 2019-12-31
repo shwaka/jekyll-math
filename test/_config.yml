@@ -1,6 +1,9 @@
 livereload: true
 plugins:
   - jekyll-math
+  - kramdown-math-zotica
+kramdown:
+  math_engine: zotica
 crossref:
   theorem: 定理
   definition: 定義

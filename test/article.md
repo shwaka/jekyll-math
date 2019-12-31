@@ -21,6 +21,13 @@ layout: mylayout
   {% zotica \sp<b><2> - 4ac %} を *判別式* という．
 {% enddefinition %}
 
+
+数式のテスト． $$ a\sp<x><2> + bx + c = 0 $$ はインライン数式です．
+
+下の数式は別行立て数式です．
+
+$$ a\sp<x><2> + bx + c = 0 $$
+
 {% cref hoge %}
 {% cref bar%}
 
