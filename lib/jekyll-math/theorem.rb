@@ -123,7 +123,10 @@ module JekyllMath
                 }
               end
             }
-            xml.div("class" => "#{@@html_class}-content")
+            xml.div("class" => "#{@@html_class}-content",
+                    "markdown" => "block")
+            # markdown="block" については
+            # https://kramdown.gettalong.org/syntax.html#html-blocks を参照
           }
         end
         xml_root = builder.doc.root
