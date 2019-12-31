@@ -4,7 +4,11 @@ layout: mylayout
 ---
 
 # Introduction
-{% theorem label=quadratic caption="二次方程式の解の公式" %}
+{% theorem label=quadratic %}
+  {% caption %}
+    二次方程式の解の公式
+    {% cite wikipedia-ja %}
+  {% endcaption %}
   {% zotica a \neq> 0 %} に対し，二次方程式
   {% zotica a\sp<x><2> + bx + c = 0 %}
   の(重複を込めて)2つの解は
@@ -78,3 +82,13 @@ This is some text!!!
 {% example %}
   This is an example of {% cref baz %}.
 {% endexample %}
+
+# References
+{% bibliography %}
+{% bibitem wikipedia-ja Wja %}
+  [二次方程式の解の公式 - Wikipedia](https://ja.wikipedia.org/wiki/%E4%BA%8C%E6%AC%A1%E6%96%B9%E7%A8%8B%E5%BC%8F%E3%81%AE%E8%A7%A3%E3%81%AE%E5%85%AC%E5%BC%8F)
+{% endbibitem %}
+{% bibitem wikipedia-en Wen %}
+  [Quadratic formula - Wikipedia](https://en.wikipedia.org/wiki/Quadratic_formula)
+{% endbibitem %}
+{% endbibliography %}

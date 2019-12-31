@@ -95,3 +95,15 @@ $proof: "proof";
     text-align: center;
   }
 }
+
+.bibitem-display {
+  color: blue;
+}
+
+.bibliography {
+  .bibitem {
+    p {
+      margin: 3px;
+    }
+  }
+}
