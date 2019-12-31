@@ -108,19 +108,19 @@ module JekyllMath
         theorem_types = TheoremTypes.new(site)
         theorem_name = theorem_types.get_name(@theorem_key)
         ref_handler.add_label(@label, theorem_name)
-        if @caption.nil?
-          caption_html = ""
-        else
-          caption_html = <<EOS
-      <span class="#{@@html_class}-caption-paren">(</span>
-      <span class="#{@@html_class}-caption-content">#{@caption}</span>
-      <span class="#{@@html_class}-caption-paren">)</span>
-EOS
-        end
+        caption_html = self.get_caption_html
+        name = ref_handler.cref(@label)
+        return self._render(content, name, caption_html)
+      end
+
+      def _render(content, name, caption_html)
+        # 最初は Nokogiri::XMl::Builder を使って生成していたけど，
+        # (特に数式内の) escape 関連で色々と問題が起きたので，
+        # 直接文字列として扱うことにした
         html = <<EOS
 <div class="#{@@html_class}" #{@@attr_prefix}-key="#{@theorem_key}" #{@@attr_prefix}-label="#{@label}">
   <div class="#{@@html_class}-header">
-    <span class="#{@@html_class}-name">#{ref_handler.cref(@label)}</span>
+    <span class="#{@@html_class}-name">#{name}</span>
     <span class="#{@@html_class}-caption">
 #{caption_html}
     </span>
@@ -131,6 +131,17 @@ EOS
 </div>
 EOS
         return html
+      end
+
+      def get_caption_html
+        if @caption.nil?
+          return ""
+        end
+        return <<EOS
+      <span class="#{@@html_class}-caption-paren">(</span>
+      <span class="#{@@html_class}-caption-content">#{@caption}</span>
+      <span class="#{@@html_class}-caption-paren">)</span>
+EOS
       end
     end
 
