@@ -100,18 +100,24 @@ module JekyllMath
       end
 
       def render(context)
-        self.clear_caption(context)  # theorem の外で指定した caption を持ち込まないように
-        self.load_caption(context)
         ref_handler = RefHandler.from_context(context)
         site = context.registers[:site]
         theorem_types = TheoremTypes.new(site)
         theorem_name = theorem_types.get_name(@theorem_key)
+        # ↓add_label から get_caption_html までの5行は実行順序に注意．
+        # - 内部にも相互参照がある場合にも正しい番号づけをするために，
+        #   add_label は super より先に実行する必要がある．
+        # - super 内で定義された caption を load するために，
+        #   super は load_caption より先．
+        # - 当然 load_caption は get_caption_html より先．
+        # - clear_caption はもっと前でも多分大丈夫．
         ref_handler.add_label(@label, theorem_name)
-        caption_html = self.get_caption_html
-        name = ref_handler.cref(@label)
+        self.clear_caption(context)  # theorem の外で指定した caption を持ち込まないように
         content = super
-        # 内部にも相互参照がある場合にも正しい番号づけをするために，
-        # super は add_label より後に実行する必要がある
+        self.load_caption(context)
+        caption_html = self.get_caption_html
+        # ↑ここまでの5行の順序に注意
+        name = ref_handler.cref(@label)
         return self._render(content, name, caption_html)
       end
 

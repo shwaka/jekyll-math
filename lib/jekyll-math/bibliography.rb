@@ -113,8 +113,14 @@ Liquid::Template.register_tag('cite', JekyllMath::Bibliography::CiteTag)
 Liquid::Template.register_tag('bibitem', JekyllMath::Bibliography::BibitemBlock)
 Liquid::Template.register_tag('bibliography', JekyllMath::Bibliography::BibliographyBlock)
 Jekyll::Hooks.register :pages, :post_render do |page|
-  if [".md", ".html"].include?(page.ext)
+  if [".md", ".html"].include?(page.ext) # page.data["ext"] は nil
     handler = JekyllMath::Bibliography::BibHandler.from_page(page)
+    handler.replace_cites
+  end
+end
+Jekyll::Hooks.register :documents, :post_render do |doc|
+  if [".md", ".html"].include?(doc.data["ext"])
+    handler = JekyllMath::Bibliography::BibHandler.from_page(doc)
     handler.replace_cites
   end
 end
