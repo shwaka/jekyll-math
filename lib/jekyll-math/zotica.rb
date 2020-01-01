@@ -3,10 +3,12 @@
 require 'nokogiri'
 require 'zotica'
 require "jekyll-math/parser"
+require "jekyll-math/crossref"
+
 
 module JekyllMath
   module Zotica
-    def self.convert(source, mode)
+    def self.convert(source, mode, tag)
       parser = ZoticaParser.new(source)
       parser.simple_math_macro_name = "m"
       parser.raw_macro_name = "raw"
@@ -19,7 +21,12 @@ module JekyllMath
       if mode == :span
         return %(<span class="math-inline">#{math_html}</span>)
       elsif mode == :block
-        return %(<div class="math-block">\n#{math_html}\n</div>)
+        return <<EOS
+<div class="math-block">
+#{math_html}
+<span class="math-tag">#{tag}</span>
+</div>
+EOS
       else
         raise "Not implemented"
       end
@@ -31,24 +38,34 @@ module JekyllMath
         parser = ::JekyllMath::ArgParser.new(text)
         args = parser.args(0, 1)
         kwargs = parser.kwargs(nil, ["label"])
+        @label = kwargs["label"]
         if args.length == 0
           @mode = :block
         else
           case args[0]
           when "inline"
             @mode = :span
+            if not @label.nil?
+              raise "label is not allowed in inline math"
+            end
           when "block"
             @mode = :block
           else
             raise "Invalid argument: '#{args[0]}' (inline or block)"
           end
         end
-        @label = kwargs["label"]
       end
 
       def render(context)
         content = super
-        html = ::JekyllMath::Zotica.convert(content, @mode)
+        if @label.nil?
+          tag = nil
+        else
+          handler = ::JekyllMath::Crossref::RefHandler.from_context(context)
+          handler.add_label(@label, :equation)
+          tag = handler.cref(@label)
+        end
+        html = ::JekyllMath::Zotica.convert(content, @mode, tag)
         return html
       end
     end

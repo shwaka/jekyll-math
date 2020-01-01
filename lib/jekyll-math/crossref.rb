@@ -42,13 +42,19 @@ module JekyllMath
       end
 
       def ref(label)
-        return @labels[label]
+        return @labels[label][:number]
       end
 
       def cref(label)
         name = @labels[label][:name]
         number = @labels[label][:number]
-        return "#{name} #{number}"
+        if name.is_a?(String)
+          return "#{name} #{number}"
+        elsif name == :equation
+          return "(#{number})"
+        else
+          raise "This can't happen!"
+        end
       end
 
       def get_number

@@ -55,13 +55,14 @@ layout: mylayout
   ほげほげ．
 
   別行立て:
-  {% zotica %}
+  {% zotica label=eq %}
     x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a>
   {% endzotica %}
 {% endexample %}
 
 {% cref hoge %}
 {% cref bar%}
+定理 {% ref bar %}
 
 {% theorem label=bar %}
   - list

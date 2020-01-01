@@ -101,7 +101,6 @@ module JekyllMath
 
       def render(context)
         self.clear_caption(context)  # theorem の外で指定した caption を持ち込まないように
-        content = super
         self.load_caption(context)
         ref_handler = RefHandler.from_context(context)
         site = context.registers[:site]
@@ -110,6 +109,9 @@ module JekyllMath
         ref_handler.add_label(@label, theorem_name)
         caption_html = self.get_caption_html
         name = ref_handler.cref(@label)
+        content = super
+        # 内部にも相互参照がある場合にも正しい番号づけをするために，
+        # super は add_label より後に実行する必要がある
         return self._render(content, name, caption_html)
       end
 
