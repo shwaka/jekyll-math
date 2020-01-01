@@ -7,7 +7,7 @@ module JekyllMath
   module Bibliography
     class BibHandler < ::JekyllMath::DataHandler
       @@cite_class = "cite"
-      @@cite_label_attr = "cite-label"
+      @@cite_attr_prefix = "cite"
       @@bibitem_display_class = "bibitem-display"
 
       def initialize(page)
@@ -23,14 +23,23 @@ module JekyllMath
         @bibitems[label] = display
       end
 
-      def get_bibitem_display(label)
-        display = @bibitems[label]
-        return %(<span class="#{@@bibitem_display_class}">[#{display}]</span>)
+      def get_bibitem_display(label, comment="")
+        text = @bibitems[label]
+        if text.nil?
+          raise "Bibitem not found: '#{label}'"
+        end
+        if comment.length > 0
+          text += ", #{comment}"
+        end
+        return %(<span class="#{@@bibitem_display_class}">[#{text}]</span>)
       end
 
-      def cite_elm_str(label)
+      def cite_elm_str(label, comment="")
+        # TODO: comment は escape した方が良い？
         return <<EOS
-<span class="#{@@cite_class}" #{@@cite_label_attr}="#{label}">
+<span class="#{@@cite_class}"
+      #{@@cite_attr_prefix}-label="#{label}"
+      #{@@cite_attr_prefix}-comment="#{comment}">
   cite: #{label}
 </span>
 EOS
@@ -40,8 +49,9 @@ EOS
         html = @page.output
         doc = Nokogiri::HTML.parse(html)
         doc.css(".#{@@cite_class}").each do |elm|
-          label = elm.attr(@@cite_label_attr)
-          elm.inner_html = self.get_bibitem_display(label)
+          label = elm.attr("#{@@cite_attr_prefix}-label")
+          comment = elm.attr("#{@@cite_attr_prefix}-comment")
+          elm.inner_html = self.get_bibitem_display(label, comment)
         end
         @page.output = doc.inner_html
       end
@@ -50,15 +60,16 @@ EOS
     class CiteTag < Liquid::Tag
       def initialize(tag_name, text, tokens)
         parser = ::JekyllMath::ArgParser.new(text)
-        args = parser.args(1)
+        args = parser.args(1, 1)
         parser.kwargs([], [])   # kwargs are not allowed
         @label = args[0]
+        @comment = args[1]
         super
       end
 
       def render(context)
         handler = BibHandler.from_context(context)
-        return handler.cite_elm_str(@label)
+        return handler.cite_elm_str(@label, @comment)
       end
     end
 

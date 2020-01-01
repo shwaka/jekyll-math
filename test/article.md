@@ -7,7 +7,7 @@ layout: mylayout
 {% theorem label=quadratic %}
   {% caption %}
     二次方程式の解の公式
-    {% cite wikipedia-ja %}
+    {% cite wikipedia-ja "l. 123" %}
   {% endcaption %}
   {% zotica a \neq> 0 %} に対し，二次方程式
   {% zotica a\sp<x><2> + bx + c = 0 %}
