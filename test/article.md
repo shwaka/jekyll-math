@@ -9,10 +9,10 @@ layout: mylayout
     二次方程式の解の公式
     {% cite wikipedia-ja "l. 123" %}
   {% endcaption %}
-  {% zotica a \neq> 0 %} に対し，二次方程式
-  {% zotica a\sp<x><2> + bx + c = 0 %}
+  $$ a \neq> 0 $$ に対し，二次方程式
+  $$ a\sp<x><2> + bx + c = 0 $$
   の(重複を込めて)2つの解は
-  {% zotica x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a> %}
+  $$ x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a> $$
   で与えられる．
 {% endtheorem %}
 {% proof %}
@@ -22,7 +22,7 @@ layout: mylayout
 {% cref quadratic %} の根号の中に現れる式は重要である．
 
 {% definition caption="判別式" %}
-  {% zotica \sp<b><2> - 4ac %} を *判別式* という．
+  $$ \sp<b><2> - 4ac $$ を *判別式* という．
 {% enddefinition %}
 
 {% example %}
@@ -42,6 +42,23 @@ layout: mylayout
   これも別行立て数式です．
 
   $$ x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a> $$
+
+  {% zotica %}
+    x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a>
+  {% endzotica %}
+
+{% example caption="Liquid::Block 製の数式のテスト" %}
+  インライン数式
+  {% zotica inline %}
+    a\sp<x><2> + bx + c = 0
+  {% endzotica %}
+  ほげほげ．
+
+  別行立て:
+  {% zotica %}
+    x = \frac<-b \pm> \sqrt<\sp<b><2> - 4 ac>><2 a>
+  {% endzotica %}
+{% endexample %}
 
 {% cref hoge %}
 {% cref bar%}
