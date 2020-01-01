@@ -133,8 +133,14 @@ Liquid::Template.register_tag('ref', JekyllMath::Crossref::RefTag)
 Liquid::Template.register_tag('cref', JekyllMath::Crossref::CrefTag)
 
 Jekyll::Hooks.register :pages, :post_render do |page|
-  if [".md", ".html"].include?(page.ext)
+  if [".md", ".html"].include?(page.ext) # page.data["ext"] は nil
     handler = JekyllMath::Crossref::RefHandler.from_page(page)
+    handler.replace_refs
+  end
+end
+Jekyll::Hooks.register :documents, :post_render do |doc|
+  if [".md", ".html"].include?(doc.data["ext"])
+    handler = JekyllMath::Crossref::RefHandler.from_page(doc)
     handler.replace_refs
   end
 end
